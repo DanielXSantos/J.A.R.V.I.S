@@ -31,7 +31,7 @@ module.exports.conversation = function (application, req, res) {
             input: {'text': message}
         }, function (err, response) {
             if (err)
-                console.log('err/or:', err);
+                console.log('error:', err);
             else {
                 console.log(JSON.stringify(response, null, 2));
                 process(response, application, req, res);
@@ -58,7 +58,8 @@ function process(input, application, req, res) {
     if(!("naoEntendi" in input['context']))
         context = input['context'];
 
-    application.app.controllers.jarvis.speak(input['output']['text'][0]);
+    if(input['output']['text'].length > 0)
+        application.app.controllers.jarvis.speak(input['output']['text'][0]);
     jarvis(input, application, req, res);
 
     res.json({'response': 'cool'});
@@ -78,6 +79,14 @@ function jarvis(input, application, req, res){
         application.app.controllers.jarvis.configMusica(input);
     }
 
-    if (input['intents'].length > 0)
-        lastIntent = input['intents'][0]['intent'];
+    if (input['intents'].length > 0){
+
+        var intent = input['intents'][0]['intent'];
+
+        if(intent === 'oQueE'){
+            application.app.controllers.jarvis.searchWiki(input);
+        }
+
+        lastIntent = intent;
+    }
 }
