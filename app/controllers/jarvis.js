@@ -8,8 +8,8 @@ var request = require('request');
 var ytdl = require('ytdl-core');
 var lame = require('lame');
 var utf8 = require('utf8');
-var fs = require('fs');
 var yql = require('yql');
+var fs = require('fs');
 
 var player = new SoundPlayer();
 var youTube = new YouTube();
@@ -31,7 +31,15 @@ var text_to_speech = new watson.TextToSpeechV1({
     password: '5AYj58DVpWhB'
 });
 
-module.exports.previsionTime = function (input) {
+module.exports.time = function () {
+    let date = new Date();
+    let hours =  date.getHours();
+    let minutes = date.getMinutes();
+
+    module.exports.speak(utf8.decode("A hora atual \xc3\xa9 " + hours + " horas e " + minutes + " minutos"));
+}
+
+module.exports.previsionWeather = function (input) {
     var query = new yql("select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='uberlandia, mg')");
 
     query.exec(function (err, data) {

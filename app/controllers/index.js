@@ -84,7 +84,9 @@ function jarvis(input, application, req, res){
         if(intent === 'oQueE'){
             application.app.controllers.jarvis.searchWiki(input);
         } else if(intent === 'tempo'){
-            application.app.controllers.jarvis.previsionTime(input);
+            application.app.controllers.jarvis.previsionWeather(input);
+        } else if(intent === 'horas'){
+            application.app.controllers.jarvis.time();
         }
 
         lastIntent = intent;
