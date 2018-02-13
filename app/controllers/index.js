@@ -70,9 +70,7 @@ function jarvis(input, application, req, res){
         input['intents'] = [];
 
     if (lastIntent === "tocarMusica") {
-        if (input['intents'].length > 0 &&
-            input['intents'][0]['intent'] === "pararMusica" &&
-            input['context']['stop'] == true) {
+        if (input['intents'].length > 0 && input['intents'][0]['intent'] === "pararMusica" && input['context']['stop'] === true) {
             application.app.controllers.jarvis.pararMusica();
             return;
         }
@@ -85,6 +83,8 @@ function jarvis(input, application, req, res){
 
         if(intent === 'oQueE'){
             application.app.controllers.jarvis.searchWiki(input);
+        } else if(intent === 'tempo'){
+            application.app.controllers.jarvis.previsionTime(input);
         }
 
         lastIntent = intent;

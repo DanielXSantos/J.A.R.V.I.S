@@ -6,4 +6,8 @@ module.exports = function (application) {
     application.post('/api/reconhecimento', function (req, res) {
         application.app.controllers.index.reconhecimento(application, req, res);
     });
+
+    application.get('/teste', function (req, res) {
+        res.json({response : 'ok'});
+    });
 }

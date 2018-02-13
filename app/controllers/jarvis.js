@@ -1,3 +1,4 @@
+var Translate = require('@google-cloud/translate');
 var watson = require('watson-developer-cloud');
 var SoundPlayer = require('soundplayer');
 var ffmpeg = require('fluent-ffmpeg');
@@ -8,12 +9,19 @@ var ytdl = require('ytdl-core');
 var lame = require('lame');
 var utf8 = require('utf8');
 var fs = require('fs');
+var yql = require('yql');
 
 var player = new SoundPlayer();
 var youTube = new YouTube();
 var musicaTocando = false;
 var lastEntity;
 var stream;
+
+const target = 'pt';
+const translate = new Translate({
+    projectId: 'algar-1516961544364',
+    keyFilename: 'ALGAR-85af4778d913.json'
+});
 
 youTube.setKey('AIzaSyC5NNONZMPnkrdvvCWJ9ordrYcybEK16mo');
 
@@ -22,6 +30,28 @@ var text_to_speech = new watson.TextToSpeechV1({
     username: 'dd2da816-cb53-4db9-b31b-b480961cfece',
     password: '5AYj58DVpWhB'
 });
+
+module.exports.previsionTime = function (input) {
+    var query = new yql("select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='uberlandia, mg')");
+
+    query.exec(function (err, data) {
+        //console.log(data.query.results.channel.item.condition);
+        var far = parseFloat(data.query.results.channel.item.condition.temp);
+        var cels = ((far-32)/(1.8)).toString().split('.')[0];
+        var text = data.query.results.channel.item.condition.text;
+
+        translate
+            .translate(text, target)
+            .then(function (results) {
+                var translation = results[0];
+                module.exports.speak(utf8.decode("Previs\xc3\xa3o do tempo para Uberl\xc3\xa2ndia, Minas Gerais " +
+                    cels + " graus com tempo " + translation));
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
+    });
+}
 
 module.exports.searchWiki = function (input) {
     var query = input['input']['text'].split(" ");
@@ -105,7 +135,7 @@ module.exports.pararMusica = function () {
     }
 };
 
-module.exports.speak = function (message) {
+module.exports.speak = function (message, callback = pass) {
     console.log(message);
     var params = {
         text: message,
@@ -123,7 +153,10 @@ module.exports.speak = function (message) {
             fs.writeFileSync('audio.wav', audio);
 
             player.sound('audio.wav', function () {
-                //console.log("Skynet esta falando");
+                //console.log("Skynet parou de falar");
+                callback();
             });
         });
 };
+
+function pass(){}
